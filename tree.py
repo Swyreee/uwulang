@@ -2,48 +2,60 @@ from typing import List
 
 
 class Node:
+	def __repr__(self):
+		return repr("RootNode")
+
 	nodes: List = []
 	push_right_count = 0
 
 	def add_node(self, other):
 		self.nodes.append(other)
 
-	def traverse(self, node=None):
-		# tree = "root"
-		print(root)
-
+	def traverse(self):
+		print("root")
 		for node in self.nodes:
-			if isinstance(node, Node):
-				self.push_right_count += 1
-				self.traverse(node)
-			else:
-				print("\t" * self.push_right_count + repr(node))
-				self.push_right_count -= 1
+			node.walk()
+
+	def walk(self, depth=1):
+		raise Exception("Do not!")
 
 
-class BinaryOperation(Node):
+class MathNode(Node):
 	def __repr__(self):
-		return repr(f"BinaryOperation(left={repr(self.left)}, right={repr(self.right)}, op={repr(self.operator)})")
+		return repr(f"MathNode(left={repr(self.left)}, right={repr(self.right)}, op={repr(self.op)})")
 
-	def __init__(self, left, right, operator):
-		self.left = left
-		self.right = right
-		self.operator = operator
+	def walk(self, depth=1):
+		indent = '\t' * depth
 
-	
 
-class UnaryOperation(Node):
-	def __repr__(self):
-		return repr(f"UnaryOperator(op={repr(self.operator)}, obj={repr(self.obj)})")
+		if isinstance(self.left, MathNode):
+			self.left.walk(depth + 1)
+		else:
+			print(indent + repr(self.left))
 
-	def __init__(self, operator, obj):
-		self.operator = operator
-		self.obj = obj
+		print(indent + '\t' + self.op)
+
+		if isinstance(self.right, MathNode):
+			self.right.walk(depth + 1)
+		else:
+			print(indent + repr(self.right))
+
+	def __init__(self, _left, _op, _right):
+		self.left = _left
+		self.right = _right
+		self.op = _op
 
 root = Node()
 
-root.add_node(BinaryOperation(1, BinaryOperation(2, UnaryOperation('+', 'a'), '*'), '+'))
-# root.add_node(UnaryOperation('+', 'a'))
+test_node1 = MathNode(1, '+', 2)
+test_node2 = MathNode(3, '+', 4)
+test_node3 = MathNode(MathNode(5, '+', 6), '+', MathNode(7, '+', 8))
+test_node4 = MathNode(MathNode(MathNode(9, '+', 10), '+', 11), '*', 12)
+
+root.add_node(test_node1)
+root.add_node(test_node2)
+root.add_node(test_node3)
+root.add_node(test_node4)
+
+print(root.nodes)
 root.traverse()
-# root.visualize_code_tree()
-# root.visualize_tree()
