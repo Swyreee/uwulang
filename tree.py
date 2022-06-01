@@ -1,23 +1,41 @@
 from typing import List
 
 
-class Node:
-	def __repr__(self):
-		return repr("RootNode")
 
-	nodes: List = []
-	push_right_count = 0
+class Tree:
+	def __init__(self):
+		self.nodes = [RootNode()]
 
 	def add_node(self, other):
 		self.nodes.append(other)
 
 	def traverse(self):
-		print("root")
 		for node in self.nodes:
 			node.walk()
 
-	def walk(self, depth=1):
-		raise Exception("Do not!")
+	def evaluate(self):
+		for node in self.nodes:
+			node.evaluate()
+
+
+
+class Node:
+	def __repr__(self):
+		return repr("BasicNode")
+
+	def walk(self):
+		print(repr(self))
+
+	def evaluate(self):
+		...
+
+	def __init__(self):
+		...
+
+
+class RootNode(Node):
+	def __repr__(self):
+		return repr("RootNode")
 
 
 class MathNode(Node):
@@ -26,7 +44,6 @@ class MathNode(Node):
 
 	def walk(self, depth=1):
 		indent = '\t' * depth
-
 
 		if isinstance(self.left, MathNode):
 			self.left.walk(depth + 1)
@@ -45,17 +62,41 @@ class MathNode(Node):
 		self.right = _right
 		self.op = _op
 
-root = Node()
+
+class AssignmentNode(Node):
+	def __repr__(self):
+		return repr(f"AssignmentNode(target={repr(self.target)}, value={repr(self.value)})")
+
+	def walk(self, depth=1):
+		indent = '\t' * depth
+
+		if isinstance(self.target, Node):
+			raise ValueError("left-hand operand must be a literal")
+
+		print(indent + f"{self.target} = ", end="")
+
+		if isinstance(self.value, Node):
+			self.value.walk(depth + 1)
+		else:
+			print(indent + repr(self.value))
+
+	def __init__(self, _target, _value):
+		self.target = _target;
+		self.value = _value;
+
+tree = Tree()
 
 test_node1 = MathNode(1, '+', 2)
 test_node2 = MathNode(3, '+', 4)
 test_node3 = MathNode(MathNode(5, '+', 6), '+', MathNode(7, '+', 8))
 test_node4 = MathNode(MathNode(MathNode(9, '+', 10), '+', 11), '*', 12)
+test_node5 = AssignmentNode('a', 3)
 
-root.add_node(test_node1)
-root.add_node(test_node2)
-root.add_node(test_node3)
-root.add_node(test_node4)
+tree.add_node(test_node1)
+tree.add_node(test_node2)
+tree.add_node(test_node3)
+tree.add_node(test_node4)
+tree.add_node(test_node5)
 
-print(root.nodes)
-root.traverse()
+tree.traverse()
+tree.evaluate()
